@@ -28,6 +28,6 @@ chrome.contextMenus.create(
   }
 );
 
-chrome.contextMenus.onClicked.addListener(function onClicked(info) {
+chrome.contextMenus.onClicked.addListener(function (info) {
   chrome.tabs.create({url : "http://images.google.com/searchbyimage?image_url="+info.srcUrl, active : false});
 });

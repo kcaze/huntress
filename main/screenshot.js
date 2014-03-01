@@ -1,61 +1,72 @@
 chrome.runtime.sendMessage({request : "get image"}, function (imgSrc){
-  var scrapCanvas = document.createElement("canvas"); 
-  var scrapCtx = scrapCanvas.getContext("2d");
   var canvas = document.createElement("canvas");
   var ctx = canvas.getContext("2d");
-  var img = new Image();
+  var selectCanvas = document.createElement("canvas"); 
+  var selectCtx = selectCanvas.getContext("2d");
+  var scrapCanvas = document.createElement("canvas"); 
+  var scrapCtx = scrapCanvas.getContext("2d");
 
-  img.onload = function() {
-    // draw the screenshot
-    canvas.width = img.width;
-    canvas.height = img.height;
-    ctx.fillStyle = "rgba(0,0,255,0.3)";
+  canvas.style.zIndex = "1";
+  selectCanvas.style.zIndex = "2";
 
-    document.body.appendChild(canvas);
+  document.body.appendChild(canvas);
+  document.body.appendChild(selectCanvas);
 
-    // set up the events for cropping (using easelJS)
-    var stage = new createjs.Stage(canvas);
-    var image = new createjs.Bitmap(imgSrc);
-    var rect = new createjs.Shape();
-    var clicked = 0;
+  var image = new Image();
+  image.addEventListener("load", function () {
+    //set up canvases and draw the screenshot
+    canvas.width = image.width;
+    canvas.height = image.height;
+    selectCanvas.width = image.width;
+    selectCanvas.height = image.height;
 
-    rect.graphics.beginFill("rgba(0,120,255,0.4)").drawRect(0,0,1,1);
-    rect.scaleX = rect.scaleY = 1; 
+    ctx.drawImage(image, 0, 0);
+    selectCtx.fillStyle = "rgba(0, 0, 255, 0.3)";
 
-    stage.addChild(image);
-    stage.addEventListener("stagemousedown", function (event) {
+    selectCanvas.addEventListener("mousemove", onMouseMove, false); 
+    selectCanvas.addEventListener("mousedown", onMouseDown, false); 
+    selectCanvas.addEventListener("mouseup", onMouseUp, false); 
+  });
+  image.src = imgSrc;
+
+  var downX = downY = 0;
+  var x = y = 0;
+  var clicked = 0;
+
+  function onMouseMove(e) {
+    x = e.pageX;
+    y = e.pageY;
+
+    selectCtx.clearRect(0, 0, selectCanvas.width, selectCanvas.height);
+    if (clicked) {
+      selectCtx.fillRect(downX, downY, x-downX, y-downY);
+    }
+  }
+
+  function onMouseDown(e) {
+    if (e.which == 1) {
       clicked = 1;
-      rect.x = event.stageX;
-      rect.y = event.stageY;
-      stage.addChild(rect);
-    });
-    stage.addEventListener("stagemouseup", function (event) {
+      downX = e.pageX;
+      downY = e.pageY;
+    }
+  }
+
+  function onMouseUp(e) {
+    if (e.which == 1){
       clicked = 0;
-      stage.removeChild(rect);
-      stage.update();
-
-      var x = rect.scaleX > 0 ? rect.x : rect.x + rect.scaleX;
-      var y = rect.scaleY > 0 ? rect.y : rect.y + rect.scaleY;
-      var img = ctx.getImageData(x, y, Math.abs(rect.scaleX), Math.abs(rect.scaleY));
-
-      scrapCanvas.width = img.width;
-      scrapCanvas.height = img.height;
+      var left = Math.min(downX, x);
+      var top = Math.min(downY, y);
+      var width = Math.abs(x - downX);
+      var height = Math.abs(y - downY);
+      var img = ctx.getImageData(left, top, width, height);
+      scrapCanvas.width = width;
+      scrapCanvas.height = height;
       scrapCtx.putImageData(img, 0, 0);
       scrapCanvas.toBlob(function (imageBlob) {
         googleReverseImageSearch(imageBlob, function(URL) {
           chrome.tabs.create({url : URL, active : false});
         });
       });
-
-      rect.scaleX = rect.scaleY = 1;
-    });
-    createjs.Ticker.addEventListener("tick", function (event) {
-      stage.update();
-      if (clicked) {
-        rect.scaleX = stage.mouseX - rect.x;
-        rect.scaleY = stage.mouseY - rect.y;
-      }
-    });
-  };
-  img.src = imgSrc;
+    }
+  }
 });

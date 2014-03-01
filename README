@@ -1,7 +1,1 @@
-Design Specification:
-1. Hotkey to allow for screengrabbing part of the site and reverse google image search that.
-2. Context menu for images to reverse google image search the entire menu.
-
-
-Idea of implementation:
-1. chrome.tabs.captureVisibleTab in order to capture current visible webpage as image, then use javascript to determine the coordinates of the grabbed section relative to current visible webpage. Do some cropping on a canvas, send to google reverse image search and then open up a new tab with the search results.
+Wut's a readme?
