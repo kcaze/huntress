@@ -1,3 +1,9 @@
+/*
+ *
+ * Copyright 2014, Herman Chau
+ *
+ */
+
 tabs = {};
 
 //Handle screenshotting
@@ -6,6 +12,7 @@ chrome.commands.onCommand.addListener(function (cmd) {
       chrome.tabs.captureVisibleTab({format : "png"}, function (dataURL) {
         chrome.tabs.create({url : "main/screenshot.html"}, function(tab) {
           tabs[tab.id] = dataURL;
+          console.log(dataURL);
         });
       });
     }
@@ -23,7 +30,7 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
 chrome.contextMenus.create(
   {
     id : "@@extension_id",
-    title : "Google Reverse Image Search", 
+    title : "Reverse Image Search", 
     contexts : ["image"]
   }
 );

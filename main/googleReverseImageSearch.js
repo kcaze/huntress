@@ -1,5 +1,4 @@
 /*
- * JavaScript Google Reverse Image Search 1.0
  *
  * Copyright 2014, Herman Chau
  *
