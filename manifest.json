@@ -1,0 +1,26 @@
+{
+	"manifest_version" : 2,
+	
+	"name" : "Reverse Image Search",
+	"description" : "",
+	"version" : "1.0",
+	
+  "permissions" : [
+    "notifications", "tabs", "contextMenus", "<all_urls>"
+  ],
+
+  "background" : {
+    "page" : "main/background.html",
+    "persistent" : false
+  },
+
+  "commands" : {
+    "screenshot" : {
+      "suggested_key" : {
+        "default" : "Ctrl+Insert",
+        "windows" : "Ctrl+Insert"
+      },
+      "description" : "Shortcut for screenshotting."
+    }
+  }
+}
