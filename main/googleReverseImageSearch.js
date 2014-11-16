@@ -16,8 +16,9 @@ function googleReverseImageSearch(imageBlob, callback) {
     if (xhr.readyState==4) {
       // regex to extract URL of search result
       // Google redirects, and this is followed transparently, so we need to extract the URL this way
-      var URL = xhr.response.match(/https:\/\/www\.google\.com\/search\?tbs=sbi:.+/)[0];
-      callback(URL);
+      var URL = xhr.response.match(/tbs=sbi:[^&]+/)[0];
+      console.log(URL);
+      callback("https://www.google.com/search?"+URL);
     }
   };
   xhr.send(fd);

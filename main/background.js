@@ -4,7 +4,7 @@
  *
  */
 
-tabs = {};
+var tabs = {};
 
 //Handle screenshotting
 chrome.commands.onCommand.addListener(function (cmd) {
