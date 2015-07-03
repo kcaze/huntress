@@ -3,7 +3,7 @@
 	
 	"name" : "Huntress Reverse Image Search",
   "short_name" : "huntress",
-	"version" : "1.3",
+	"version" : "1.4",
 
 	"description" : "Find where an image came from. Press Ctrl+I (Cmd+I on Mac OS X) to screenshot and search a portion of the page.",
   "icons" : {
