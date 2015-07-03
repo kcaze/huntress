@@ -1,11 +1,11 @@
 {
 	"manifest_version" : 2,
 	
-	"name" : "hunt Reverse Image Search",
-  "short_name" : "huntRIS",
+	"name" : "Huntress Reverse Image Search",
+  "short_name" : "huntress",
 	"version" : "1.2",
 
-	"description" : "Find where an image came from. Press Ctrl+Ins to screenshot and search a portion of the page.",
+	"description" : "Find where an image came from. Press Ctrl+I (Cmd+I on Mac OS X) to screenshot and search a portion of the page.",
   "icons" : {
     "16" : "images/icon16.png",
     "48" : "images/icon48.png",
@@ -24,10 +24,19 @@
   "commands" : {
     "screenshot" : {
       "suggested_key" : {
-        "default" : "Ctrl+Insert",
-        "windows" : "Ctrl+Insert"
+        "default" : "Ctrl+I",
+        "windows" : "Ctrl+I",
+		"mac" : "Command+I"
       },
       "description" : "Shortcut for screenshotting."
     }
+  },
+  
+  "browser_action" : {
+    "default_icon": {
+	  "19" : "images/icon19.png",
+	  "38" : "images/icon38.png"
+    },
+	"default_title": "Reverse image search page"
   }
 }

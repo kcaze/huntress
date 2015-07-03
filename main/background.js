@@ -7,16 +7,14 @@
 var tabs = {};
 
 //Handle screenshotting
-chrome.commands.onCommand.addListener(function (cmd) {
-    if (cmd == "screenshot") {
-      chrome.tabs.captureVisibleTab({format : "png"}, function (dataURL) {
-        chrome.tabs.create({url : "main/screenshot.html"}, function(tab) {
-          tabs[tab.id] = dataURL;
-          console.log(dataURL);
-        });
-      });
-    }
-});
+function screenshotPage() {
+  chrome.tabs.captureVisibleTab({format : "png"}, function (dataURL) {
+    chrome.tabs.create({url : "main/screenshot.html"}, function(tab) {
+      tabs[tab.id] = dataURL;
+      console.log(dataURL);
+    });
+  });
+}
 
 chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
   if (message.request == "get image") {
@@ -25,12 +23,18 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
   }
 });
 
+// Add keyboard command listener.
+chrome.commands.onCommand.addListener(function (cmd) {
+  if (cmd == "screenshot") {
+    screenshotPage();
+  }
+});
 
-// Create context menu for reverse googling image by URL.
+// Add context menu and listener.
 chrome.contextMenus.create(
   {
     id : "@@extension_id",
-    title : "Reverse Image Search", 
+    title : "Reverse image search", 
     contexts : ["image"]
   }
 );
@@ -38,3 +42,6 @@ chrome.contextMenus.create(
 chrome.contextMenus.onClicked.addListener(function (info) {
   chrome.tabs.create({url : "http://images.google.com/searchbyimage?image_url="+info.srcUrl, active : false});
 });
+
+// Add browser action listener.
+chrome.browserAction.onClicked.addListener(screenshotPage);
