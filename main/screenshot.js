@@ -1,4 +1,4 @@
-/*
+/*	
  *
  * Copyright 2014, Herman Chau
  *
@@ -27,7 +27,6 @@ chrome.runtime.sendMessage({request : "get image"}, function (imgSrc){
     selectCanvas.height = image.height;
 
     ctx.drawImage(image, 0, 0);
-    selectCtx.fillStyle = "rgba(0, 0, 255, 0.3)";
 
     selectCanvas.addEventListener("mousemove", onMouseMove, false); 
     selectCanvas.addEventListener("mousedown", onMouseDown, false); 
@@ -38,6 +37,24 @@ chrome.runtime.sendMessage({request : "get image"}, function (imgSrc){
   var downX = downY = 0;
   var x = y = 0;
   var clicked = 0;
+  
+  function drawCropper() {
+  	selectCtx.fillStyle = "rgba(0, 0, 0, 0.75)";
+  	selectCtx.fillRect(0, 0, selectCanvas.width, selectCanvas.height);
+    selectCtx.clearRect(downX, downY, x-downX, y-downY);
+	selectCtx.strokeStyle = "rgba(255, 255, 255, 1)";
+	selectCtx.setLineDash([10, 15]);
+	selectCtx.beginPath();
+	selectCtx.moveTo(x, 0);
+	selectCtx.lineTo(x, selectCanvas.height);
+	selectCtx.moveTo(downX, 0);
+	selectCtx.lineTo(downX, selectCanvas.height);
+	selectCtx.moveTo(0, y);
+	selectCtx.lineTo(selectCanvas.width, y);
+	selectCtx.moveTo(0, downY);
+	selectCtx.lineTo(selectCanvas.width, downY);
+	selectCtx.stroke();
+  }
 
   function onMouseMove(e) {
     x = e.pageX;
@@ -45,7 +62,7 @@ chrome.runtime.sendMessage({request : "get image"}, function (imgSrc){
 
     selectCtx.clearRect(0, 0, selectCanvas.width, selectCanvas.height);
     if (clicked) {
-      selectCtx.fillRect(downX, downY, x-downX, y-downY);
+		drawCropper();
     }
   }
 
