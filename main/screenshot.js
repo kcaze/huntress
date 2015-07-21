@@ -4,7 +4,18 @@
  *
  */
 
-chrome.runtime.sendMessage({request : "get image"}, function (imgSrc){
+var resultTabs = {};
+
+chrome.runtime.onMessage.addListener(
+  function (message, sender, sendResponse) {
+    if (message.request == "get image") {
+      sendResponse(resultTabs[sender.tab.id]);
+      delete resultTabs[sender.tab.id];
+    }
+  }
+);
+
+chrome.runtime.sendMessage({request : "get screenshot"}, function (imgSrc){
   var canvas = document.createElement("canvas");
   var ctx = canvas.getContext("2d");
   var selectCanvas = document.createElement("canvas"); 
@@ -39,21 +50,21 @@ chrome.runtime.sendMessage({request : "get image"}, function (imgSrc){
   var clicked = 0;
   
   function drawCropper() {
-  	selectCtx.fillStyle = "rgba(0, 0, 0, 0.75)";
-  	selectCtx.fillRect(0, 0, selectCanvas.width, selectCanvas.height);
+    selectCtx.fillStyle = "rgba(0, 0, 0, 0.75)";
+    selectCtx.fillRect(0, 0, selectCanvas.width, selectCanvas.height);
     selectCtx.clearRect(downX, downY, x-downX, y-downY);
-	selectCtx.strokeStyle = "rgba(255, 255, 255, 1)";
-	selectCtx.setLineDash([10, 15]);
-	selectCtx.beginPath();
-	selectCtx.moveTo(x, 0);
-	selectCtx.lineTo(x, selectCanvas.height);
-	selectCtx.moveTo(downX, 0);
-	selectCtx.lineTo(downX, selectCanvas.height);
-	selectCtx.moveTo(0, y);
-	selectCtx.lineTo(selectCanvas.width, y);
-	selectCtx.moveTo(0, downY);
-	selectCtx.lineTo(selectCanvas.width, downY);
-	selectCtx.stroke();
+    selectCtx.strokeStyle = "rgba(255, 255, 255, 1)";
+    selectCtx.setLineDash([10, 15]);
+    selectCtx.beginPath();
+    selectCtx.moveTo(x, 0);
+    selectCtx.lineTo(x, selectCanvas.height);
+    selectCtx.moveTo(downX, 0);
+    selectCtx.lineTo(downX, selectCanvas.height);
+    selectCtx.moveTo(0, y);
+    selectCtx.lineTo(selectCanvas.width, y);
+    selectCtx.moveTo(0, downY);
+    selectCtx.lineTo(selectCanvas.width, downY);
+    selectCtx.stroke();
   }
 
   function onMouseMove(e) {
@@ -62,7 +73,7 @@ chrome.runtime.sendMessage({request : "get image"}, function (imgSrc){
 
     selectCtx.clearRect(0, 0, selectCanvas.width, selectCanvas.height);
     if (clicked) {
-		drawCropper();
+      drawCropper();
     }
   }
 
@@ -77,6 +88,7 @@ chrome.runtime.sendMessage({request : "get image"}, function (imgSrc){
   function onMouseUp(e) {
     if (e.which == 1){
       clicked = 0;
+      selectCtx.clearRect(0, 0, selectCanvas.width, selectCanvas.height);
       var left = Math.min(downX, x);
       var top = Math.min(downY, y);
       var width = Math.abs(x - downX);
@@ -85,11 +97,12 @@ chrome.runtime.sendMessage({request : "get image"}, function (imgSrc){
       scrapCanvas.width = width;
       scrapCanvas.height = height;
       scrapCtx.putImageData(img, 0, 0);
-      scrapCanvas.toBlob(function (imageBlob) {
-        googleReverseImageSearch(imageBlob, function(URL) {
-          chrome.tabs.create({url : URL, active : false});
-        });
-      });
+      chrome.tabs.create(
+        {url: "main/result.html", active : false },
+        function (tab) {
+          resultTabs[tab.id] = scrapCanvas.toDataURL();
+        }
+      );
     }
   }
 });

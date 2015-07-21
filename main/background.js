@@ -6,22 +6,26 @@
 
 var tabs = {};
 
+// When a huntress tab is created, it sends a request for the 
+// screenshotted image. This message listener responds with the
+// screenshot image data. 
+chrome.runtime.onMessage.addListener(
+  function (message, sender, sendResponse) {
+    if (message.request == "get screenshot") {
+      sendResponse(tabs[sender.tab.id]);
+      delete tabs[sender.tab.id];
+    }
+  }
+);
+
 //Handle screenshotting
 function screenshotPage() {
   chrome.tabs.captureVisibleTab({format : "png"}, function (dataURL) {
     chrome.tabs.create({url : "main/screenshot.html"}, function(tab) {
       tabs[tab.id] = dataURL;
-      console.log(dataURL);
     });
   });
 }
-
-chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
-  if (message.request == "get image") {
-    sendResponse(tabs[sender.tab.id]);
-    delete tabs[sender.tab.id];
-  }
-});
 
 // Add keyboard command listener.
 chrome.commands.onCommand.addListener(function (cmd) {
