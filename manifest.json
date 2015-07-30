@@ -3,7 +3,7 @@
 	
 	"name" : "Huntress Reverse Image Search",
   "short_name" : "huntress",
-	"version" : "1.6",
+	"version" : "1.7",
 
 	"description" : "Find where an image came from. Press Ctrl+I (Cmd+I on Mac OS X) to screenshot and search a portion of the page.",
   "icons" : {
@@ -24,9 +24,9 @@
   "commands" : {
     "screenshot" : {
       "suggested_key" : {
-        "default" : "Ctrl+I",
-        "windows" : "Ctrl+I",
-		"mac" : "Command+I"
+        "default" : "Ctrl+E",
+        "windows" : "Ctrl+E",
+	"mac" : "Command+E"
       },
       "description" : "Shortcut for screenshotting."
     }
