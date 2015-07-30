@@ -20,7 +20,7 @@ chrome.runtime.onMessage.addListener(
 
 //Handle screenshotting
 function screenshotPage() {
-  chrome.tabs.captureVisibleTab({format : "png"}, function (dataURL) {
+  chrome.tabs.captureVisibleTab({format : "png", quality: 100}, function (dataURL) {
     chrome.tabs.create({url : "main/screenshot.html"}, function(tab) {
       tabs[tab.id] = dataURL;
     });

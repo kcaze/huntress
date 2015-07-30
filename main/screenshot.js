@@ -37,6 +37,9 @@ chrome.runtime.sendMessage({request : "get screenshot"}, function (imgSrc){
     selectCanvas.width = image.width;
     selectCanvas.height = image.height;
 
+    // TODO: figure out how to have a non-blurry screenshot on retina
+    // screens
+    ctx.scale(1/window.devicePixelRatio, 1/window.devicePixelRatio)
     ctx.drawImage(image, 0, 0);
 
     selectCanvas.addEventListener("mousemove", onMouseMove, false); 
