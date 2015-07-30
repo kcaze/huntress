@@ -5,7 +5,7 @@
   "short_name" : "huntress",
 	"version" : "1.7",
 
-	"description" : "Find where an image came from. Press Ctrl+I (Cmd+I on Mac OS X) to screenshot and search a portion of the page.",
+	"description" : "Find where an image came from. Press Ctrl+E (Cmd+E on Mac OS X) to screenshot and search a portion of the page.",
   "icons" : {
     "16" : "images/icon16.png",
     "48" : "images/icon48.png",
