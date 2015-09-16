@@ -5,7 +5,7 @@
   "short_name" : "huntress",
   "version" : "1.8",
 
-  "description" : "Crop and reverse search images using Google or TinEye. Huntress is designed specifically to aid in identifying images in puzzle hunts.",
+  "description" : "Crop and reverse search images using Google or TinEye. Designed specifically to aid in identifying images in puzzle hunts.",
   "icons" : {
     "16" : "icons/icon16.png",
     "48" : "icons/icon48.png",
