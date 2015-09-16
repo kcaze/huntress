@@ -150,9 +150,9 @@ function initialize(dataURL) {
       1/window.devicePixelRatio, 
       1/window.devicePixelRatio);*/
 
-    document.addEventListener("mousemove", onMouseMove, false); 
-    document.addEventListener("mousedown", onMouseDown, false); 
-    document.addEventListener("mouseup", onMouseUp, false); 
+    canvas.addEventListener("mousemove", onMouseMove, false); 
+    canvas.addEventListener("mousedown", onMouseDown, false); 
+    canvas.addEventListener("mouseup", onMouseUp, false); 
     document.addEventListener("keydown", onKeyDown, false); 
     draw();
   });
