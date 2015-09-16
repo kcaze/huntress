@@ -1,11 +1,11 @@
 {
-	"manifest_version" : 2,
-	
-	"name" : "Huntress Reverse Image Search",
-  "short_name" : "huntress",
-	"version" : "1.7",
+  "manifest_version" : 2,
 
-	"description" : "Find where an image came from. Press Ctrl+E (Cmd+E on Mac OS X) to screenshot and search a portion of the page.",
+  "name" : "Huntress Reverse Image Search",
+  "short_name" : "huntress",
+  "version" : "1.8",
+
+  "description" : "Crop and reverse search images using Google or TinEye. Huntress is designed specifically to aid in identifying images in puzzle hunts.",
   "icons" : {
     "16" : "icons/icon16.png",
     "48" : "icons/icon48.png",
