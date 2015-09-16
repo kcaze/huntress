@@ -7,9 +7,9 @@
 
 	"description" : "Find where an image came from. Press Ctrl+E (Cmd+E on Mac OS X) to screenshot and search a portion of the page.",
   "icons" : {
-    "16" : "images/icon16.png",
-    "48" : "images/icon48.png",
-    "128" : "images/icon128.png"
+    "16" : "icons/icon16.png",
+    "48" : "icons/icon48.png",
+    "128" : "icons/icon128.png"
   },
 
   "permissions" : [
@@ -17,7 +17,7 @@
   ],
 
   "background" : {
-    "page" : "main/background.html",
+    "page" : "html/background.html",
     "persistent" : false
   },
 
@@ -34,8 +34,8 @@
   
   "browser_action" : {
     "default_icon": {
-	  "19" : "images/icon19.png",
-	  "38" : "images/icon38.png"
+	  "19" : "icons/icon19.png",
+	  "38" : "icons/icon38.png"
     },
 	"default_title": "Reverse image search page"
   }
