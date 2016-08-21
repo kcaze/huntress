@@ -1,6 +1,6 @@
 // Copyright 2014-present Herman Chau.
-
 var screenshot = document.createElement('canvas');
+var screenshotContext = document.createElement('canvas');
 var canvas = document.createElement('canvas');
 var context = canvas.getContext('2d');
 var cropperCanvas = document.createElement('canvas');
@@ -136,7 +136,7 @@ function draw() {
 }
 
 function initialize(dataURL) {
-  document.body.appendChild(canvas);
+  //document.body.appendChild(canvas);
 
   var image;
   image = new Image();
@@ -145,11 +145,6 @@ function initialize(dataURL) {
     screenshot.height = canvas.height = cropperCanvas.height = image.height;
     screenshot.getContext('2d').drawImage(image, 0, 0);
 
-    // TODO: Figure out a retina fix.
-    /*context.scale(
-      1/window.devicePixelRatio, 
-      1/window.devicePixelRatio);*/
-
     canvas.addEventListener("mousemove", onMouseMove, false); 
     canvas.addEventListener("mousedown", onMouseDown, false); 
     canvas.addEventListener("mouseup", onMouseUp, false); 
@@ -157,6 +152,7 @@ function initialize(dataURL) {
     draw();
   });
   image.src = dataURL;
+  document.body.appendChild(image);
 }
 
 chrome.runtime.sendMessage({request : 'get screenshot'}, initialize);
