@@ -136,7 +136,7 @@ function draw() {
 }
 
 function initialize(dataURL) {
-  //document.body.appendChild(canvas);
+  document.body.appendChild(canvas);
 
   var image;
   image = new Image();
@@ -152,7 +152,6 @@ function initialize(dataURL) {
     draw();
   });
   image.src = dataURL;
-  document.body.appendChild(image);
 }
 
 chrome.runtime.sendMessage({request : 'get screenshot'}, initialize);
