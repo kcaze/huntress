@@ -56,22 +56,15 @@ function onMouseUp(eventData) {
   var croppedScreenshot = screenshot.getContext('2d')
     .getImageData(left, top, width, height);
 
-  var temporaryCanvas = document.createElement("canvas"); 
+  var temporaryCanvas = document.createElement("canvas");
   var temporaryContext = temporaryCanvas.getContext("2d");
   temporaryCanvas.width = width;
   temporaryCanvas.height = height;
   temporaryContext.putImageData(croppedScreenshot, 0, 0);
-  temporaryCanvas.toBlob(function (screenshotBlob) {
-    chrome.tabs.create(
-      {url : '/html/result.html', active : false},
-      function (tab) {
-        searchEngines[currentSearchEngine].search(
-          screenshotBlob, 
-          function (url) {
-            chrome.tabs.update(tab.id, {url:url});
-          });
-      });
-  }, 'image/png');
+  var data = {
+    image : temporaryCanvas.toDataURL()
+  };
+  chrome.tabs.create({url : '/html/result.html#' + JSON.stringify(data), active : false});
 }
 
 function onMouseMove(eventData) {
@@ -81,20 +74,20 @@ function onMouseMove(eventData) {
 
 function drawCropper() {
   cropperContext.clearRect(
-    0, 
-    0, 
-    cropperCanvas.width, 
+    0,
+    0,
+    cropperCanvas.width,
     cropperCanvas.height);
   cropperContext.fillStyle = "rgba(0, 0, 0, 0.75)";
   cropperContext.fillRect(
-    0, 
-    0, 
-    cropperCanvas.width, 
+    0,
+    0,
+    cropperCanvas.width,
     cropperCanvas.height);
   cropperContext.clearRect(
-    mouse.initialX, 
-    mouse.initialY, 
-    mouse.currentX - mouse.initialX, 
+    mouse.initialX,
+    mouse.initialY,
+    mouse.currentX - mouse.initialX,
     mouse.currentY - mouse.initialY);
   cropperContext.strokeStyle = "rgba(255, 255, 255, 1)";
   cropperContext.setLineDash([10, 15]);
@@ -120,8 +113,8 @@ function drawSearchEngine() {
   context.fillText(
     'Searching with: ' +
     searchEngines[currentSearchEngine].name +
-    ' (press \'s\' to switch)', 
-    0, 
+    ' (press \'s\' to switch)',
+    0,
     0);
 }
 
@@ -145,10 +138,10 @@ function initialize(dataURL) {
     screenshot.height = canvas.height = cropperCanvas.height = image.height;
     screenshot.getContext('2d').drawImage(image, 0, 0);
 
-    canvas.addEventListener("mousemove", onMouseMove, false); 
-    canvas.addEventListener("mousedown", onMouseDown, false); 
-    canvas.addEventListener("mouseup", onMouseUp, false); 
-    document.addEventListener("keydown", onKeyDown, false); 
+    canvas.addEventListener("mousemove", onMouseMove, false);
+    canvas.addEventListener("mousedown", onMouseDown, false);
+    canvas.addEventListener("mouseup", onMouseUp, false);
+    document.addEventListener("keydown", onKeyDown, false);
     draw();
   });
   image.src = dataURL;
