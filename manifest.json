@@ -13,7 +13,8 @@
   },
 
   "permissions" : [
-    "notifications", "tabs", "contextMenus", "<all_urls>"
+    "tabs",
+    "<all_urls>"
   ],
 
   "background" : {
@@ -21,22 +22,18 @@
     "persistent" : false
   },
 
-  "commands" : {
-    "screenshot" : {
-      "suggested_key" : {
-        "default" : "Ctrl+E",
-        "windows" : "Ctrl+E",
-	"mac" : "Command+E"
-      },
-      "description" : "Shortcut for screenshotting."
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["/js/main.js"]
     }
-  },
+  ],
 
   "browser_action" : {
     "default_icon": {
 	  "19" : "icons/icon19.png",
 	  "38" : "icons/icon38.png"
     },
-	"default_title": "Reverse image search page"
+	  "default_title": "Activate Huntress Reverse Image Search"
   }
 }

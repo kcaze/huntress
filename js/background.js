@@ -1,59 +1,61 @@
 // Copyright 2014-present Herman Chau.
 
-var screenshotQueue = {};
-// When a Huntress tab is created, it sends a request for the 
-// screenshotted image. This message listener responds with the
-// screenshot image data. 
+/**
+ * When the user clicks on the browser action, a message is sent to the current
+ * tab to activate the Huntress UI in that tab.
+ **/
+chrome.browserAction.onClicked.addListener(tab => {
+  chrome.tabs.sendMessage(
+    tab.id,
+    {}
+  );
+});
+
+/**
+ * When the user selects a portion of the screen to crop and reverse image,
+ * a message is sent from the content script of that page to this background
+ * script which then handles the logic for taking the screenshot, cropping it,
+ * and creating a new tab that loads the reverse image search result.
+ **/
 chrome.runtime.onMessage.addListener(
-  function (message, sender, sendResponse) {
-    if (message.request == 'get screenshot') {
-      sendResponse(screenshotQueue[sender.tab.id]);
-      delete screenshotQueue[sender.tab.id];
-    }
+  function (message) {
+    screenshot()
+    .then(dataURL => cropImage(
+      dataURL,
+      message.left, message.top,
+      message.width, message.height))
+    .then(dataURL => search(dataURL));
   }
 );
 
-function screenshotPage() {
-  chrome.tabs.captureVisibleTab(
-    {format : 'png', quality: 100}, 
-    function (dataURL) {
-      // Resize image based on devicePixelRatio, fixes the image on retina displays.
-      var canvas = document.createElement('canvas'),
-          context = canvas.getContext('2d'),
-          img = new Image();
-      img.src = dataURL;
-      canvas.width = img.width / window.devicePixelRatio;
-      canvas.height = img.height / window.devicePixelRatio;
-      context.webkitImageSmoothingEnabled = false;
-      context.imageSmoothingEnabled = false;
-      context.drawImage(img, 0, 0, canvas.width, canvas.height);
-      dataURL = canvas.toDataURL();
-
-      chrome.tabs.create(
-        {url : '/html/huntress.html'}, 
-        function(tab) {
-          screenshotQueue[tab.id] = dataURL;
-        });
-    });
+function screenshot() {
+  return new Promise((resolve, reject) => {
+    chrome.tabs.captureVisibleTab({format : 'png', quality: 100}, resolve);
+  });
 }
 
-chrome.browserAction.onClicked.addListener(screenshotPage);
+function cropImage(dataURL, left, top, width, height) {
+  console.log(left, top, width, height);
+  return new Promise((resolve, reject) => {
+    var canvas = document.createElement("canvas");
+    var context = canvas.getContext("2d");
+    var image = new Image();
+    canvas.width = width;
+    canvas.height = height;
+    image.onload = function() {
+      context.drawImage(image, -left, -top);
+      resolve(canvas.toDataURL());
+    };
+    image.src = dataURL;
+  });
+}
 
-chrome.commands.onCommand.addListener(function (cmd) {
-  if (cmd == 'screenshot') {
-    screenshotPage();
-  }
-});
-
-chrome.contextMenus.create({
-  id : '@@extension_id',
-  title : 'Reverse image search', 
-  contexts : ['image']
-});
-
-chrome.contextMenus.onClicked.addListener(function (info) {
+function search(dataURL) {
+  var searchData = {
+    imageDataURL: dataURL
+  };
   chrome.tabs.create({
-    url : "http://images.google.com/searchbyimage?image_url="+info.srcUrl, 
-    active : false});
-});
-
+    url : '/html/result.html#' + JSON.stringify(searchData),
+    active : false}
+  );
+}
