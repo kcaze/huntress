@@ -13,11 +13,11 @@ chrome.runtime.onMessage.addListener(message => {
 function initializeCanvas() {
   var canvas = document.createElement('canvas');
   canvas.style.all = 'initial';
-  canvas.style.position = 'absolute';
+  canvas.style.position = 'fixed';
   canvas.style.top = 0;
   canvas.style.left = 0;
   canvas.style.zIndex = 1 << 30;
-  //canvas.style.display = 'none';
+  canvas.style.display = 'none';
   canvas.drawClear = drawClear;
   canvas.drawCropper = drawCropper;
   canvas.addEventListener("mousedown", makeEventListener("mousedown"));
@@ -56,12 +56,12 @@ function initializeCanvas() {
   function makeEventListener(eventType) {
     return function(eventData) {
       if (eventData.which != 1) return;
-      mouse[eventType](eventData.pageX, eventData.pageY);
+      mouse[eventType](eventData);
       canvas.drawClear();
       if (mouse.clicked) {
         canvas.drawCropper(
-          mouse.initialX, mouse.initialY,
-          mouse.currentX, mouse.currentY
+          mouse.initialClientX, mouse.initialClientY,
+          mouse.currentClientX, mouse.currentClientY
         );
       }
     }
@@ -79,26 +79,35 @@ function initializeCanvas() {
 function initializeMouse() {
   var mouse = {
     clicked: false,
-    currentX: 0,
-    currentY: 0,
-    initialX: 0,
-    initialY: 0,
-    mousedown: (x, y) => {
+    currentPageX: 0,
+    currentPageY: 0,
+    currentClientX: 0,
+    currentClientY: 0,
+    initialPageX: 0,
+    initialPageY: 0,
+    initialClientX: 0,
+    initialClientY: 0,
+    mousedown: eventData => {
       mouse.clicked = true;
-      mouse.initialX = x;
-      mouse.initialY = y;
+      mouse.initialPageX = mouse.currentPageX = eventData.pageX;
+      mouse.initialPageY = mouse.currentPageY = eventData.pageY;
+      mouse.initialClientX = mouse.currentClientX = eventData.clientX;
+      mouse.initialClientY = mouse.currentClientY = eventData.clientY;
     },
-    mousemove: (x, y) => {
-      mouse.currentX = x; mouse.currentY = y;
+    mousemove: eventData => {
+      mouse.currentPageX = eventData.pageX;
+      mouse.currentPageY = eventData.pageY;
+      mouse.currentClientX = eventData.clientX;
+      mouse.currentClientY = eventData.clientY;
     },
-    mouseup: (x, y) => {
+    mouseup: eventData => {
       mouse.clicked = false;
       chrome.runtime.sendMessage(
         {
-          left : Math.min(mouse.initialX, mouse.currentX),
-          top: Math.min(mouse.initialY, mouse.currentY),
-          width: Math.abs(mouse.initialX - mouse.currentX),
-          height: Math.abs(mouse.initialY - mouse.currentY)
+          left : Math.min(mouse.initialClientX, mouse.currentClientX),
+          top: Math.min(mouse.initialClientY, mouse.currentClientY),
+          width: Math.abs(mouse.initialClientX - mouse.currentClientX),
+          height: Math.abs(mouse.initialClientY - mouse.currentClientY)
         }
       );
     }
