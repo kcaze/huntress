@@ -1,13 +1,19 @@
+var isActive = false;
 var canvas = initializeCanvas();
 var mouse = initializeMouse();
 
 document.body.appendChild(canvas);
 chrome.runtime.onMessage.addListener(message => {
-  // toggle the display from none to inline or vice versa
-  canvas.style.display = canvas.style.display == 'none' ? '' : 'none';
-  canvas.width = window.screen.availWidth;
-  canvas.height = window.screen.availHeight;
-  canvas.drawClear();
+  if (isActive) {
+    isActive = false;
+    canvas.style.display = 'none';
+  } else {
+    isActive = true;
+    canvas.style.display = '';
+    canvas.width = window.screen.availWidth;
+    canvas.height = window.screen.availHeight;
+    canvas.drawClear();
+  }
 });
 
 function initializeCanvas() {
@@ -18,6 +24,7 @@ function initializeCanvas() {
   canvas.style.left = 0;
   canvas.style.zIndex = 1 << 30;
   canvas.style.display = 'none';
+  canvas.style.cursor = 'crosshair';
   canvas.drawClear = drawClear;
   canvas.drawCropper = drawCropper;
   canvas.addEventListener("mousedown", makeEventListener("mousedown"));
