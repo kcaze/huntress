@@ -3,18 +3,7 @@ var canvas = initializeCanvas();
 var mouse = initializeMouse();
 
 document.body.appendChild(canvas);
-chrome.runtime.onMessage.addListener(message => {
-  if (isActive) {
-    isActive = false;
-    canvas.style.display = 'none';
-  } else {
-    isActive = true;
-    canvas.style.display = '';
-    canvas.width = window.screen.availWidth;
-    canvas.height = window.screen.availHeight;
-    canvas.drawClear();
-  }
-});
+addOnMessageListener();
 
 function initializeCanvas() {
   var canvas = document.createElement('canvas');
@@ -22,7 +11,7 @@ function initializeCanvas() {
   canvas.style.position = 'fixed';
   canvas.style.top = 0;
   canvas.style.left = 0;
-  canvas.style.zIndex = 1 << 30;
+  canvas.style.zIndex = 2147483647;  // best we can do :/
   canvas.style.display = 'none';
   canvas.style.cursor = 'crosshair';
   canvas.drawClear = drawClear;
@@ -36,8 +25,10 @@ function initializeCanvas() {
     var context = canvas.getContext('2d');
     context.save();
     context.clearRect(0, 0, canvas.width, canvas.height);
-    context.fillStyle = 'rgba(0, 0, 0, 0.25)';
-    context.fillRect(0, 0, canvas.width, canvas.height);
+    if (mouse.clicked) {
+      context.fillStyle = 'rgba(0, 0, 0, 0.25)';
+      context.fillRect(0, 0, canvas.width, canvas.height);
+    }
     context.restore();
   }
 
@@ -111,10 +102,10 @@ function initializeMouse() {
       mouse.clicked = false;
       chrome.runtime.sendMessage(
         {
-          left : Math.min(mouse.initialClientX, mouse.currentClientX),
-          top: Math.min(mouse.initialClientY, mouse.currentClientY),
-          width: Math.abs(mouse.initialClientX - mouse.currentClientX),
-          height: Math.abs(mouse.initialClientY - mouse.currentClientY)
+          left : window.devicePixelRatio * Math.min(mouse.initialClientX, mouse.currentClientX),
+          top: window.devicePixelRatio * Math.min(mouse.initialClientY, mouse.currentClientY),
+          width: window.devicePixelRatio * Math.abs(mouse.initialClientX - mouse.currentClientX),
+          height: window.devicePixelRatio * Math.abs(mouse.initialClientY - mouse.currentClientY)
         }
       );
     }
@@ -122,40 +113,30 @@ function initializeMouse() {
   return mouse;
 }
 
-function screenshot() {
-  return new Promise((resolve, reject) => {
-    chrome.runtime.sendMessage(null, {}, null,
-      response => resolve(JSON.parse(response))
-    );
-  });
-}
-
-function cropImage(dataURL, x1, y1, x2, y2) {
-  var left = Math.min(x1, x2);
-  var top = Math.min(y1, y2);
-  var width = Math.abs(x1 - x2);
-  var height = Math.abs(y1 - y2);
-
-  return new Promise((resolve, reject) => {
-    var canvas = document.createElement("canvas");
-    var context = cropCanvas.getContext("2d");
-    var image = new Image();
-    canvas.width = width;
-    canvas.height = height;
-    image.onload = function(){
-      context.drawImage(image, -left, -top);
-      resolve(canvas.toDataURL());
-    };
-    image.src = dataURL;
-  });
-}
-
-function search(dataURL) {
-  var searchData = {
-    imageDataURL: dataURL
+function addOnMessageListener() {
+  var messageHandlers = {
+    toggleActive: onToggleActive,
+    queryIsActive: onQueryIsActive
   };
-  chrome.tabs.create({
-    url : '/html/result.html#' + JSON.stringify(searchData),
-    active : false}
-  );
+
+  chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    messageHandlers[message.type](message.data, sender, sendResponse);
+  });
+
+  function onToggleActive(data, sender, sendResponse) {
+    if (isActive) {
+      isActive = false;
+      canvas.style.display = 'none';
+    } else {
+      isActive = true;
+      canvas.style.display = '';
+      canvas.width = window.screen.availWidth;
+      canvas.height = window.screen.availHeight;
+      canvas.drawClear();
+    }
+  }
+
+  function onQueryIsActive(data, sender, sendResponse) {
+    sendResponse(isActive);
+  }
 }

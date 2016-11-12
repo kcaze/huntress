@@ -5,11 +5,22 @@
  * tab to activate the Huntress UI in that tab.
  **/
 chrome.browserAction.onClicked.addListener(tab => {
-  chrome.tabs.sendMessage(
-    tab.id,
-    {}
-  );
+  sendToggleActiveMessage(tab.id, response => {
+    sendQueryIsActive(tab.id, isActive => {
+      setBrowserActionIcon(isActive);
+    });
+  });
 });
+
+/**
+ * Update the browser icon when switching tabs.
+ **/
+chrome.tabs.onActivated.addListener(activeInfo => {
+  sendQueryIsActive(activeInfo.tabId, isActive => {
+    setBrowserActionIcon(isActive);
+  });
+});
+
 
 /**
  * When the user selects a portion of the screen to crop and reverse image,
@@ -18,12 +29,14 @@ chrome.browserAction.onClicked.addListener(tab => {
  * and creating a new tab that loads the reverse image search result.
  **/
 chrome.runtime.onMessage.addListener(
-  function (message) {
+  function (message, sender, response) {
     screenshot()
-    .then(dataURL => cropImage(
-      dataURL,
-      message.left, message.top,
-      message.width, message.height))
+    .then(dataURL => {
+      return cropImage(
+        dataURL,
+        message.left, message.top,
+        message.width, message.height);
+    })
     .then(dataURL => search(dataURL));
   }
 );
@@ -35,7 +48,6 @@ function screenshot() {
 }
 
 function cropImage(dataURL, left, top, width, height) {
-  console.log(left, top, width, height);
   return new Promise((resolve, reject) => {
     var canvas = document.createElement("canvas");
     var context = canvas.getContext("2d");
@@ -58,4 +70,50 @@ function search(dataURL) {
     url : '/html/result.html#' + JSON.stringify(searchData),
     active : false}
   );
+}
+
+function sendToggleActiveMessage(tabId, responseCallback) {
+  chrome.tabs.sendMessage(
+    tabId,
+    {
+      type: 'toggleActive',
+      data: null
+    },
+    responseCallback
+  );
+}
+
+function sendQueryIsActive(tabId, responseCallback) {
+  chrome.tabs.sendMessage(
+    tabId,
+    {
+      type: 'queryIsActive',
+      data: null
+    },
+    responseCallback
+  );
+}
+
+function setBrowserActionIcon(isActive) {
+  if (isActive) {
+    chrome.browserAction.setTitle({
+      title: 'Deactivate Huntress Reverse Image Search'
+    });
+    chrome.browserAction.setIcon({
+      path: {
+    	  '19' : '/icons/icon19_activated.png',
+    	  '38' : '/icons/icon38_activated.png'
+      }
+    });
+  } else {
+    chrome.browserAction.setTitle({
+      title: 'Activate Huntress Reverse Image Search'
+    });
+    chrome.browserAction.setIcon({
+      path: {
+    	  '19' : '/icons/icon19_deactivated.png',
+    	  '38' : '/icons/icon38_deactivated.png'
+      }
+    });
+  }
 }

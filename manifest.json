@@ -31,8 +31,8 @@
 
   "browser_action" : {
     "default_icon": {
-	  "19" : "icons/icon19.png",
-	  "38" : "icons/icon38.png"
+  	  "19" : "icons/icon19_deactivated.png",
+  	  "38" : "icons/icon38_deactivated.png"
     },
 	  "default_title": "Activate Huntress Reverse Image Search"
   }
