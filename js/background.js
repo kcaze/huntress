@@ -5,22 +5,15 @@
  * tab to activate the Huntress UI in that tab.
  **/
 chrome.browserAction.onClicked.addListener(tab => {
-  sendToggleActiveMessage(tab.id, response => {
-    sendQueryIsActive(tab.id, isActive => {
-      setBrowserActionIcon(isActive);
-    });
-  });
+  sendToggleActiveMessage(tab.id, updateBrowserActionIcon);
 });
 
 /**
- * Update the browser icon when switching tabs.
+ * Update the browser icon when switching or refreshing tabs.
  **/
-chrome.tabs.onActivated.addListener(activeInfo => {
-  sendQueryIsActive(activeInfo.tabId, isActive => {
-    setBrowserActionIcon(isActive);
-  });
-});
-
+chrome.tabs.onActivated.addListener(updateBrowserActionIcon);
+chrome.tabs.onUpdated.addListener(updateBrowserActionIcon);
+chrome.windows.onFocusChanged.addListener(updateBrowserActionIcon);
 
 /**
  * When the user selects a portion of the screen to crop and reverse image,
@@ -67,7 +60,7 @@ function search(dataURL) {
     imageDataURL: dataURL
   };
   chrome.tabs.create({
-    url : '/html/result.html#' + JSON.stringify(searchData),
+    url : '/html/result.html#' + encodeURI(JSON.stringify(searchData)),
     active : false}
   );
 }
@@ -81,6 +74,17 @@ function sendToggleActiveMessage(tabId, responseCallback) {
     },
     responseCallback
   );
+}
+
+function updateBrowserActionIcon() {
+  chrome.tabs.query({
+    active: true,
+    lastFocusedWindow: true,
+  }, tabs => {
+    sendQueryIsActive(tabs[0].id, isActive => {
+      setBrowserActionIcon(isActive);
+    });
+  });
 }
 
 function sendQueryIsActive(tabId, responseCallback) {

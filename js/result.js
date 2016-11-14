@@ -1,4 +1,4 @@
-var data = JSON.parse(window.location.hash.substring(1));
+var data = JSON.parse(decodeURI(window.location.hash.substring(1)));
 googleReverseImageSearch(
   dataURLtoBlob(data.imageDataURL),
   function(url) {

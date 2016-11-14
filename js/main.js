@@ -2,23 +2,26 @@ var isActive = false;
 var canvas = initializeCanvas();
 var mouse = initializeMouse();
 
-document.body.appendChild(canvas);
+canvas.setInvisible();
 addOnMessageListener();
 
 function initializeCanvas() {
   var canvas = document.createElement('canvas');
   canvas.style.all = 'initial';
-  canvas.style.position = 'fixed';
-  canvas.style.top = 0;
+  canvas.width = window.screen.availWidth;
+  canvas.height = window.screen.availHeight;
   canvas.style.left = 0;
+  canvas.style.top = 0;
+  canvas.style.position = 'fixed';
   canvas.style.zIndex = 2147483647;  // best we can do :/
-  canvas.style.display = 'none';
   canvas.style.cursor = 'crosshair';
+  canvas.setVisible = setVisible;
+  canvas.setInvisible = setInvisible;
   canvas.drawClear = drawClear;
   canvas.drawCropper = drawCropper;
-  canvas.addEventListener("mousedown", makeEventListener("mousedown"));
-  canvas.addEventListener("mousemove", makeEventListener("mousemove"));
-  canvas.addEventListener("mouseup", makeEventListener("mouseup"));
+  document.addEventListener("mousedown", makeEventListener("mousedown"));
+  document.addEventListener("mousemove", makeEventListener("mousemove"));
+  document.addEventListener("mouseup", makeEventListener("mouseup"));
   return canvas;
 
   function drawClear() {
@@ -26,7 +29,7 @@ function initializeCanvas() {
     context.save();
     context.clearRect(0, 0, canvas.width, canvas.height);
     if (mouse.clicked) {
-      context.fillStyle = 'rgba(0, 0, 0, 0.25)';
+      context.fillStyle = 'rgba(0, 0, 0, 0.75)';
       context.fillRect(0, 0, canvas.width, canvas.height);
     }
     context.restore();
@@ -53,6 +56,8 @@ function initializeCanvas() {
 
   function makeEventListener(eventType) {
     return function(eventData) {
+      if (!isActive) return;
+      eventData.preventDefault();
       if (eventData.which != 1) return;
       mouse[eventType](eventData);
       canvas.drawClear();
@@ -65,12 +70,15 @@ function initializeCanvas() {
     }
   }
 
-  function getDocumentWidth() {
-    return window.screen.availWidth;
+  function setVisible() {
+    document.body.append(canvas);
   }
 
-  function getDocumentHeight() {
-    return window.screen.availHeight;
+  function setInvisible() {
+    try {
+      document.body.removeChild(canvas);
+    } catch (e) {
+    }
   }
 }
 
@@ -126,13 +134,10 @@ function addOnMessageListener() {
   function onToggleActive(data, sender, sendResponse) {
     if (isActive) {
       isActive = false;
-      canvas.style.display = 'none';
+      canvas.setInvisible();
     } else {
       isActive = true;
-      canvas.style.display = '';
-      canvas.width = window.screen.availWidth;
-      canvas.height = window.screen.availHeight;
-      canvas.drawClear();
+      canvas.setVisible();
     }
   }
 
