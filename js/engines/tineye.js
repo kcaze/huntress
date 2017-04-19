@@ -10,7 +10,7 @@ function tineyeReverseImageSearch(imageBlob, callback) {
   var fd = new FormData();
 
   fd.append("image", imageBlob, "image.png");
-  xhr.open("POST", "http://tineye.com/search");
+  xhr.open("POST", "https://tineye.com/search");
 
   xhr.onreadystatechange = function () {
     if (xhr.readyState==4) {

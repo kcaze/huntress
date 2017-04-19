@@ -14,16 +14,7 @@ var mouse = {
   initialY: 0,
 };
 
-var searchEngines = [
-  {
-    search: googleReverseImageSearch,
-    name: 'Google'
-  },
-  {
-    search: tineyeReverseImageSearch,
-    name: 'TinEye'
-  }
-];
+var searchEngines = ['Google', 'Tineye'];
 var currentSearchEngine = 0;
 
 function onKeyDown(eventData) {
@@ -61,7 +52,8 @@ function onMouseUp(eventData) {
   temporaryCanvas.height = height;
   temporaryContext.putImageData(croppedScreenshot, 0, 0);
   var data = {
-    image : temporaryCanvas.toDataURL()
+    image : temporaryCanvas.toDataURL(),
+    searchEngine : searchEngines[currentSearchEngine],
   };
   chrome.tabs.create({url : '/html/result.html#' + JSON.stringify(data), active : false});
 }
@@ -111,7 +103,7 @@ function drawSearchEngine() {
   context.fillStyle = 'white';
   context.fillText(
     'Searching with: ' +
-    searchEngines[currentSearchEngine].name +
+    searchEngines[currentSearchEngine] +
     ' (press \'s\' to switch)',
     0,
     0);
