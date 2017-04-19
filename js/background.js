@@ -79,8 +79,9 @@ function sendToggleActiveMessage(tabId, responseCallback) {
 function updateBrowserActionIcon() {
   chrome.tabs.query({
     active: true,
-    lastFocusedWindow: true,
+    currentWindow: true,
   }, tabs => {
+    if (tabs.length != 1) return;
     sendQueryIsActive(tabs[0].id, isActive => {
       setBrowserActionIcon(isActive);
     });
