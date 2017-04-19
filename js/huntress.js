@@ -52,7 +52,6 @@ function onMouseUp(eventData) {
   var top = Math.min(mouse.initialY, mouse.currentY);
   var width = Math.abs(mouse.initialX - mouse.currentX);
   var height = Math.abs(mouse.initialY - mouse.currentY);
-  console.log(mouse);
   var croppedScreenshot = screenshot.getContext('2d')
     .getImageData(left, top, width, height);
 

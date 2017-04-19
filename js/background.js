@@ -17,23 +17,26 @@ function screenshotPage() {
   chrome.tabs.captureVisibleTab(
     {format : 'png', quality: 100}, 
     function (dataURL) {
+      console.log(dataURL);
       // Resize image based on devicePixelRatio, fixes the image on retina displays.
       var canvas = document.createElement('canvas'),
           context = canvas.getContext('2d'),
           img = new Image();
-      img.src = dataURL;
-      canvas.width = img.width / window.devicePixelRatio;
-      canvas.height = img.height / window.devicePixelRatio;
-      context.webkitImageSmoothingEnabled = false;
-      context.imageSmoothingEnabled = false;
-      context.drawImage(img, 0, 0, canvas.width, canvas.height);
-      dataURL = canvas.toDataURL();
+      img.onload = function() {
+        canvas.width = img.width / window.devicePixelRatio;
+        canvas.height = img.height / window.devicePixelRatio;
+        context.webkitImageSmoothingEnabled = false;
+        context.imageSmoothingEnabled = false;
+        context.drawImage(img, 0, 0, canvas.width, canvas.height);
+        dataURL = canvas.toDataURL();
 
-      chrome.tabs.create(
-        {url : '/html/huntress.html'}, 
-        function(tab) {
-          screenshotQueue[tab.id] = dataURL;
-        });
+        chrome.tabs.create(
+          {url : '/html/huntress.html'}, 
+          function(tab) {
+            screenshotQueue[tab.id] = dataURL;
+          });
+      }
+      img.src = dataURL;
     });
 }
 
@@ -46,7 +49,7 @@ chrome.commands.onCommand.addListener(function (cmd) {
 });
 
 chrome.contextMenus.create({
-  id : '@@extension_id',
+  id : 'nkhjamjppefmeceaokadfacbdmmcmdpg',
   title : 'Reverse image search', 
   contexts : ['image']
 });
