@@ -3,7 +3,7 @@
 
   "name" : "Huntress Reverse Image Search",
   "short_name" : "huntress",
-  "version" : "1.11",
+  "version" : "1.13",
 
   "description" : "Crop and reverse search images using Google or TinEye. Designed specifically to aid in identifying images in puzzle hunts.",
   "icons" : {
