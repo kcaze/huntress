@@ -56,13 +56,16 @@ function cropImage(dataURL, left, top, width, height) {
 }
 
 function search(dataURL) {
-  var searchData = {
-    imageDataURL: dataURL
-  };
-  chrome.tabs.create({
-    url : '/html/result.html#' + encodeURI(JSON.stringify(searchData)),
-    active : false}
-  );
+  for (const engine of ["yandex", "google"]) {
+    var searchData = {
+      imageDataURL: dataURL,
+      engine: engine,
+    };
+    chrome.tabs.create({
+      url : '/html/result.html#' + encodeURI(JSON.stringify(searchData)),
+      active : false}
+    );
+  }
 }
 
 function sendToggleActiveMessage(tabId, responseCallback) {
